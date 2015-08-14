@@ -95,7 +95,7 @@ class BinarySearchTree():
                 else:
                     return root.getLeft() or root.getRight()
 
-            elif root.getValue() < value:
+            elif value < root.getValue():
                 root.setLeft(__delete(root.left, value))
             else:
                 root.setRight(__delete(root.right, value))
