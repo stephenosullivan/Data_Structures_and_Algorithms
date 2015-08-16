@@ -1,12 +1,36 @@
 __author__ = 'stephenosullivan'
 
 
-class BinarySearchTree():
+class ToDictMixin(object):
+    def todict(self):
+        return self._traverse_dict(self.__dict__)
+
+    def _traverse_dict(self, instance_dict):
+        output = {}
+        for key, value in instance_dict.items():
+            output[key] = self._traverse(key, value)
+        return output
+
+    def _traverse(self, key, value):
+        if isinstance(value, ToDictMixin):
+            return value.todict()
+        elif isinstance(value, dict):
+            return self._traverse_dict(value)
+        # elif isinstance(value, list):
+        #     return [self._traverse(key, i) for i in value]
+        elif hasattr(value, '__dict__'):
+            return self._traverse_dict(value.__dict__)
+        else:
+            return value
+
+
+class BinarySearchTree(ToDictMixin):
     class __Node:
         def __init__(self, value, left=None, right=None):
+            self.value = value
             self.left = left
             self.right = right
-            self.value = value
+
 
         def getValue(self):
             return self.value
@@ -136,6 +160,7 @@ def main2():
                   "2. Delete from tree \n"
                   "3. Lookup value \n"
                   "4. Print tree \n"
+                  "5. Print dict tree \n"
                   "Choice? ")
 
         if s == '1':
@@ -148,6 +173,7 @@ def main2():
                     break
 
                 tree.insert(val_int)
+            print("\n")
 
         elif s == '2':
             # Deletion
@@ -180,6 +206,8 @@ def main2():
         elif s == '4':
             print(tree)
 
+        elif s == '5':
+            print(tree.todict())
         else:
             print("Try again")
 
