@@ -10,28 +10,39 @@ class Graph:
         self.edges = edges
 
     def path(self, start, end):
-        def _path(self, start, end):
-            vertices_to_visit = [start]
-            visited = set()
-            return start + _path()
+        vertices_to_visit = [start]
+        visited = []
+        output = [start]
+        visited.append(start)
+        outputs = []
 
-
-        while vertices_to_visit:
-            vertex = vertices_to_visit.pop()
-            visited.add(vertex)
-            output.append(vertex)
-            pop = False
+        while output:
+            pop = True
             for edge in self.edges:
-                print(edge[0], edge[1], edge[2])
-                if edge[0] == vertex and edge[1] not in visited:
-                    vertices_to_visit.append(edge[1])
+
+                if edge[0] == output[-1] and edge[1] not in visited:
+                    print(output)
+                    output.append(edge[1])
+                    pop = False
                     if edge[1] == end:
-                        output.append(end)
-                        return output
-                    pop = True
-            if pop is False:
-                output.pop()
-        return False
+                        outputs.append(output[:])
+                        output.pop()
+                        pop = True
+                    else:
+                        visited.append(edge[1])
+                    break
+
+            if pop:
+                backpoint = output.pop()
+                print("v1", visited)
+                while len(visited) > 1 and visited[-1] != backpoint and visited[-2] != backpoint:
+                        visited.pop()
+                print('v2',visited)
+
+        if outputs:
+            return outputs
+        else:
+            return False
 
 if __name__ == '__main__':
     Vertices = set()
