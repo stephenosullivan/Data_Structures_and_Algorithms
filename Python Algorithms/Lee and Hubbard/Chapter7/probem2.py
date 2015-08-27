@@ -62,7 +62,7 @@ class Graph:
                 visited.add(neighbor)
         return None
 
-    def dijkstra(self, start):
+    def notdijkstra(self, start):
         queue = [(start, Decimal(0))]
         self.vertices[start].previous = Decimal(0)
         while queue:
@@ -124,6 +124,6 @@ if __name__ == '__main__':
 
 
     print(graph.bfs(graph.vertices[9], graph.vertices[16]))
-    print(graph.dijkstra(0))
+    print(graph.notdijkstra(0))
     #print(graph.vertices[29].adjacent)
     #print(graph.vertices[28].adjacent)
