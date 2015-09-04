@@ -26,6 +26,7 @@ class Heapv1:
             if bigChild:
                 if self.storage[startIndex] < self.storage[bigChild]:
                     self.storage[startIndex], self.storage[bigChild] = self.storage[bigChild], self.storage[startIndex]
+                    self.siftDownFromTo(bigChild, self.size - 1)
             startIndex -= 1
 
     def biggerChild(self, parentIndex, lastIndex):
@@ -148,6 +149,13 @@ def test3():
     print(thirdHeap)
     print(thirdHeap.sort())
 
+def test4():
+    fourthHeap = Heapv1()
+    firstList = [3, 4, 2, 1, 5]
+    fourthHeap.fastbuildfrom(firstList)
+    print(fourthHeap)
+    print(fourthHeap.sort())
+
 
 if __name__ == "__main__":
     from timeit import Timer
@@ -161,4 +169,6 @@ if __name__ == "__main__":
     t = Timer("test3()", "from __main__ import test3")
     print(t.timeit(number=1))
 
+    t = Timer("test4()", "from __main__ import test4")
+    print(t.timeit(number=1))
 
