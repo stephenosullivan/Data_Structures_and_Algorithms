@@ -1,7 +1,7 @@
 __author__ = 'stephenosullivan'
 
 # Min Heap
-class PriorityQueue():
+class Priority_Queue():
     # Each item in the queue is a tuple (priority, *data)
     def __init__(self, items=None):
         if items:
@@ -26,6 +26,7 @@ class PriorityQueue():
 
     def shrink_allocation(self):
         self.storage = self.storage[:self.allocation//2 + 1]
+        self.allocation = len(self.storage)
 
     def parentFromChild(self, childIndex):
         return (childIndex - 1)//2
@@ -56,15 +57,15 @@ class PriorityQueue():
 
     def enqueue(self, item):
         """Push item onto storage"""
+        #print('size:', self.size, 'allocation:', self.allocation, len(self.storage))
         if self.size == self.allocation:
             self.extend_allocation()
         self.storage[self.size] = item
         self.siftUp(self.size)
         self.size += 1
 
-    def dequeue(self):
+    def dequeue(self, index=0):
         """Take the min node off the top"""
-        index = 0
         output = self.storage[index]
         self.storage[index], self.storage[self.size-1] = self.storage[self.size-1], None
         self.size -= 1
@@ -75,10 +76,12 @@ class PriorityQueue():
 
     def siftUp(self, index):
         """Bubble added item up through storage"""
-        if self.storage[self.parentFromChild(index)][0] > self.storage[index][0]:
-            self.storage[self.parentFromChild(index)], self.storage[index] = self.storage[index], self.storage[self.parentFromChild(index)]
-            if self.parentFromChild(index) > 0:
-                self.siftUp(self.parentFromChild(index))
+        if index > 0:
+            print(index, self.parentFromChild(index), self.storage[index])
+            if self.storage[self.parentFromChild(index)][0] > self.storage[index][0]:
+                self.storage[self.parentFromChild(index)], self.storage[index] = self.storage[index], self.storage[self.parentFromChild(index)]
+                if self.parentFromChild(index) > 0:
+                    self.siftUp(self.parentFromChild(index))
 
     def siftDownFrom(self, index):
         """Move large items down"""
@@ -95,9 +98,40 @@ class PriorityQueue():
     def __bool__(self):
         return bool(self.size)
 
+    def __iter__(self):
+        for i in range(self.size):
+            yield self.storage[i]
+
+    def __len__(self):
+        return self.size
+
+    def __getitem__(self, item):
+        for i in range(self.size):
+            if self.storage[i][1] == item:
+                return self.storage[i]
+        else:
+            raise KeyError
+
+    def __setitem__(self, item, value):
+        for i in range(self.size):
+            if self.storage[i][1] == item:
+                self.dequeue(i)
+                self.enqueue((value, item))
+                break
+        else:
+            raise KeyError
+
+    def __contains__(self, item):
+        for i in range(self.size):
+            if self.storage[i][1] == item:
+                return True
+        else:
+            return False
+
+
 if __name__ == '__main__':
     firstList = [(4, 71), (3, 57), (2, 36), (1, 15), (5, 101)]
-    firstHeap = PriorityQueue(firstList)
+    firstHeap = Priority_Queue(firstList)
     print(firstHeap)
     firstHeap.enqueue((1,100))
     ordered = []
@@ -106,7 +140,7 @@ if __name__ == '__main__':
         print(firstHeap)
     print(ordered)
 
-    secondHeap = PriorityQueue()
+    secondHeap = Priority_Queue()
     secondHeap.enqueue((4, 71))
     secondHeap.enqueue((3, 57))
     secondHeap.enqueue((2, 36))
