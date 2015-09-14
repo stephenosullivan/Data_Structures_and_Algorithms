@@ -35,6 +35,11 @@ class Graph:
         def __lt__(self, other):
             return self.weight < other.weight
 
+        def __iter__(self):
+            yield self.vertex1
+            yield self.vertex2
+            yield self.weight
+
     def addVertex(self, label, value=None):
         self.vertexList[label] = self.Vertex(value)
 
@@ -162,6 +167,39 @@ class Graph:
                     nodes_to_visit.append(vertex)
         return False
 
+    def minSpanTree(self):
+        copyQueue = self.edgeList
+        #w, edge = copyQueue.dequeue()
+        #print(edge.vertex1, edge.vertex2, edge.weight)
+        #return
+        self.partition = dict()
+        self.vertexTree = dict()
+        for vertex in self.vertexList:
+            self.partition[vertex] = vertex
+            self.vertexTree[vertex] = []
+        while copyQueue:
+            w, currentEdge = copyQueue.dequeue()
+            print(w)
+            v1, v2, _ = currentEdge
+            #print(v1,v2)
+            if self.sameSetAndUnion(v1, v2):
+                self.vertexTree[v1].append(v2)
+            #yield self.vertexTree
+        return self.vertexTree
+
+    def sameSetAndUnion(self, v1, v2):
+        #print('fn call', v1, v2)
+        if self.partition[self.root(v1)] != self.partition[self.root(v2)]:
+            #print(self.partition[v1], self.partition[v2])
+            self.partition[self.root(v2)] = self.partition[self.root(v1)]
+            return True
+
+    def root(self, vertex):
+        while self.partition[vertex] != vertex:
+            vertex = self.partition[vertex]
+        return vertex
+
+
 if __name__ == '__main__':
     g = Graph(directed=False)
     for i in range(30):
@@ -193,8 +231,9 @@ if __name__ == '__main__':
     g.addEdge((13, 16, 7.32))
     g.addEdge((14, 15, 4.07))
     g.addEdge((14, 17, 13.47))
-    g.addEdge((15, 16, 8.81))
-    g.addEdge((15, 17, 1.24))
+    g.addEdge((15, 16, 1.24))
+    g.addEdge((16, 17, 9.01))
+    g.addEdge((15, 17, 8.81))
     g.addEdge((23, 24, 2.18))
     g.addEdge((24, 27, 4.67))
     g.addEdge((27, 25, 3.51))
@@ -233,3 +272,7 @@ if __name__ == '__main__':
     #         print('Distance from %d to %d is %.2f' % (0, i, distance))
 
 #[(0, Decimal('0')), (1, Decimal('2.02')), (2, Decimal('9.98')), (3, Decimal('4.45')), (4, Decimal('3.72')), (5, Decimal('7.00')), (6, Decimal('13.4')), (7, Decimal('11.3')), (8, Decimal('14.6')), (9, Decimal('8.52')), (10, Decimal('6.20')), (11, Decimal('7.87')), (12, Decimal('10.0')), (13, Decimal('23.0')), (14, Decimal('27.6')), (15, Decimal('23.7')), (16, Decimal('23.9')), (17, Decimal('14.9')), (18, Decimal('19.0')), (19, Decimal('20.5')), (20, Decimal('22.0')), (21, Decimal('28.2')), (22, Decimal('27.7')), (23, Decimal('25.5')), (24, Decimal('23.3')), (25, Decimal('25.2')), (26, Decimal('25.2')), (27, Decimal('28.0')), (28, Decimal('31.3')), (29, Decimal('35.5'))]
+
+    # for line in list(g.minSpanTree()):
+    #     print(line)
+    print(g.minSpanTree())
