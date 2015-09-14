@@ -169,6 +169,8 @@ class Graph:
 
     def minSpanTree(self):
         copyQueue = self.edgeList
+        copyQueue = [edge for edge in self.edgeList]
+        copyQueue.sort()
         #w, edge = copyQueue.dequeue()
         #print(edge.vertex1, edge.vertex2, edge.weight)
         #return
@@ -178,7 +180,7 @@ class Graph:
             self.partition[vertex] = vertex
             self.vertexTree[vertex] = []
         while copyQueue:
-            w, currentEdge = copyQueue.dequeue()
+            w, currentEdge = copyQueue.pop(0)
             print(w)
             v1, v2, _ = currentEdge
             #print(v1,v2)
@@ -198,6 +200,7 @@ class Graph:
         while self.partition[vertex] != vertex:
             vertex = self.partition[vertex]
         return vertex
+
 
 
 if __name__ == '__main__':
