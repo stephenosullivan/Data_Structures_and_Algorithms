@@ -204,7 +204,7 @@ class Graph:
 
 
 if __name__ == '__main__':
-    g = Graph(directed=False)
+    g = Graph(directed=True)
     for i in range(30):
         g.addVertex(i, i)
     g.addEdge((0, 1, 2.02))
