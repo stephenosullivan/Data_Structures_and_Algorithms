@@ -143,11 +143,6 @@ def findMazeExit(maze):
 
 
 if __name__ == '__main__':
-    a = []
-    # for line in sys.stdin:
-    #     a.append(line)
-    #     sys.stderr.write(line + '\n')
-    #
     search = next(sys.stdin).rstrip()
     mazefile = next(sys.stdin).rstrip()
 
@@ -163,27 +158,15 @@ if __name__ == '__main__':
 
         mazeentry = findMazeEntry(maze)
         mazeexit = findMazeExit(maze)
-        sys.stderr.write(str((mazeentry, mazeexit)))
 
-    sys.stderr.write(search)
     searchfunc = eval(search)
-
-
     path = searchfunc(maze, mazeentry, mazeexit)
 
     print('done', flush=True)
-    sys.stderr.write('done\n')
 
     length = len(path) - 1
     for node in path[::-1]:
-        sys.stderr.write(str((node, length)) + '\n')
         print(node[0][0], node[0][1], node[1], flush=True)
         length -= 1
 
-
-    sys.stderr.write('done\n')
     print('eof', flush=True)
-
-
-    # if s == 'dfs':
-    #     pass
