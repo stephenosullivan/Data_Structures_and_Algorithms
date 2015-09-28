@@ -8,6 +8,7 @@ import math
 import datetime
 import time
 import sys
+import copy
 
 screenMin = 0
 screenMax = 300
@@ -20,15 +21,15 @@ class Board:
     # Immutable from the perspective of a board object.
     def __init__(self, board=None, screen=None):
         self.screen = screen
-        if screen == None:
-            if board!=None:
+        if screen is None:
+            if board is not None:
                 self.screen = board.screen
 
         self.items = []
         for i in range(3):
             rowlst = []
             for j in range(3):
-                if board==None:
+                if board is None:
                     rowlst.append(Dummy())
                 else:
                     rowlst.append(board[i][j])
@@ -49,8 +50,15 @@ class Board:
     # This method should return true if the two boards, self and other,
     # represent exactly the same state.
     # READER EXERCISE: YOU MUST COMPLETE THIS FUNCTION
-    def __eq__(self,other):
-        pass
+    def __eq__(self, other):
+        if type(other) == type(self):
+            for i in range(3):
+                for j in range(3):
+                    if self[i][j] == other[i][j]:
+                        return False
+            return True
+        return False
+
 
     # This method will mutate this board to contain all dummy
     # turtles. This way the board can be reset when a new game
@@ -71,14 +79,56 @@ class Board:
     # If the human has won, return -1. Otherwise, return 0.
     # READER EXERCISE: YOU MUST COMPLETE THIS FUNCTION
     def eval(self):
-        pass
+        for line in self.lines():
+            if len(line) == 1:
+                if 1 in line:
+                    return 1
+                elif -1 in line:
+                    return -1
+        else:
+            return 0
+
+    def lines(self):
+        for line in self.row():
+            yield line
+
+        for line in self.col():
+            yield line
+
+        for line in self.diags():
+            yield line
+
+    def row(self):
+        for i in range(3):
+            a = set()
+            for j in range(3):
+                a.add(self[i][j].eval())
+            yield a
+
+    def col(self):
+        for i in range(3):
+            a = set()
+            for j in range(3):
+                a.add(self[j][i].eval())
+            yield a
+
+    def diags(self):
+        a = set()
+        for i in range(3):
+            a.add(self[i][i].eval())
+        yield a
+
+        a = set()
+        for i in range(3):
+            a.add(self[2-i][i].eval())
+        yield a
 
     # This method should return True if the board
     # is completely filled up (no dummy turtles).
     # Otherwise, it should return False.
     # READER EXERCISE: YOU MUST COMPLETE THIS FUNCTION
     def full(self):
-        pass
+        return all([i.eval() for row in self for i in row])
 
     # This method should draw the X's and O's
     # Of this board on the screen.
@@ -91,6 +141,86 @@ class Board:
                     self[row][col].goto(col*100+50,row*100+50)
 
         self.screen.update()
+
+    def __repr__(self):
+        output = "Board(\n["
+        for i in range(3):
+            for j in range(3):
+                output += str(self[i][j].eval())
+            output += "\n"
+        output += "])"
+        return output
+
+class DummyBoard:
+    def __init__(self, board):
+        self.items = []
+        for i in range(3):
+            row = []
+            for j in range(3):
+                row.append(board[i][j])
+            self.items.append(row)
+
+    def __getitem__(self, index):
+        return self.items[index]
+
+    def eval(self):
+        for line in self.lines():
+            if len(line) == 1:
+                if 1 in line:
+                    return 1
+                elif -1 in line:
+                    return -1
+        else:
+            return 0
+
+    def lines(self):
+        for line in self.row():
+            yield line
+
+        for line in self.col():
+            yield line
+
+        for line in self.diags():
+            yield line
+
+    def row(self):
+        for i in range(3):
+            a = set()
+            for j in range(3):
+                a.add(self[i][j].eval())
+            yield a
+
+    def col(self):
+        for i in range(3):
+            a = set()
+            for j in range(3):
+                a.add(self[j][i].eval())
+            yield a
+
+    def diags(self):
+        a = set()
+        for i in range(3):
+            a.add(self[i][i].eval())
+        yield a
+
+        a = set()
+        for i in range(3):
+            a.add(self[2-i][i].eval())
+        yield a
+
+    def full(self):
+        return all([i.eval() for row in self for i in row])
+
+    def __repr__(self):
+        output = "Board(\n["
+        for i in range(3):
+            for j in range(3):
+                output += str(self[i][j].eval())
+                if j != 2:
+                    output += ','
+            output += "\n"
+        output += "])"
+        return output
 
 # This class is just for placeholder objects when no move has been made
 # yet at a position in the board. Having eval() return 0 is convenient when no
@@ -137,6 +267,21 @@ class O(RawTurtle):
     def eval(self):
         return Human
 
+class DummyX:
+    def __init__(self):
+        pass
+
+    def eval(self):
+        return Computer
+
+class DummyO:
+    def __init__(self):
+        pass
+
+    def eval(self):
+        return Human
+
+
 # The minimax function is given a player (1 = Computer, -1 = Human) and a
 # board object. When the player = Computer, minimax returns the maximum
 # value of all possible moves that the Computer could make. When the player =
@@ -147,9 +292,35 @@ class O(RawTurtle):
 # The base case results when, given the state of the board, someone has won or
 # the board is full.
 # READER EXERCISE: YOU MUST COMPLETE THIS FUNCTION
-def minimax(player,board):
-    pass
+def minimax(player, board):
+    if board.eval():
+        return board.eval()
+    elif board.full():
+        return 0
+    else:
+        if player == 1:
+            maximum = -1
+            for testboard in possible(player, board):
+                maximum = max(minimax(- player, testboard), maximum)
+            return maximum
+        else:
+            minimum = 1
+            for testboard in possible(player, board):
+                minimum = min(minimax(- player, testboard), minimum)
+            return minimum
 
+def possible(player, board):
+    if player == Computer:
+        piece = DummyX()
+    else:
+        piece = DummyO()
+
+    for i in range(3):
+        for j in range(3):
+            newboard = DummyBoard(board)
+            if newboard[i][j].eval() == 0:
+                newboard[i][j] = piece
+                yield newboard
 
 
 class TicTacToe(tkinter.Frame):
@@ -237,9 +408,25 @@ class TicTacToe(tkinter.Frame):
             # if the best move is in the first row and third column
             # then maxMove would be (0,2).
 
-            row, col = maxMove
+            row, col = maxMove()
             board[row][col] = X(cv)
             self.locked = False
+
+        def maxMove():
+            firstWinLoseDraw = {Computer: None, 0: None, Human: None}
+            for i in range(3):
+                for j in range(3):
+                    nextboard = board
+                    if board[i][j].eval() == 0:
+                        nextboard[i][j] = X(cv)
+                        state = minimax(Human, nextboard)
+                        if state == 1:
+                            return i, j
+                        if firstWinLoseDraw[state] is None:
+                            firstWinLoseDraw[state] = (i, j)
+                        nextboard[i][j] = Dummy()
+            return firstWinLoseDraw[0] or firstWinLoseDraw[Human]
+
 
 
         def mouseClick(x,y):
